@@ -8,29 +8,34 @@ export default function AdminDashboard() {
   const [leads, setLeads] = useState([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-
   const navigate = useNavigate();
-  const token = localStorage.getItem("admin_token");
 
-  // Fetch leads
-  const fetchLeads = async () => {
+  const fetchLeads = async (token) => {
     try {
       const res = await api.get("/leads", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLeads(res.data);
     } catch {
+      localStorage.removeItem("admin_token");
       navigate("/admin/login");
     }
   };
 
   useEffect(() => {
-    if (!token) navigate("/admin/login");
-    fetchLeads();
-  }, []);
+    const token = localStorage.getItem("admin_token");
 
-  // Excel download
+    if (!token) {
+      navigate("/admin/login");
+      return;
+    }
+
+    fetchLeads(token);
+  }, [navigate]);
+
   const downloadExcel = async () => {
+    const token = localStorage.getItem("admin_token");
+
     try {
       const res = await api.get("/leads/export/excel", {
         headers: { Authorization: `Bearer ${token}` },
@@ -47,21 +52,20 @@ export default function AdminDashboard() {
     }
   };
 
-  // Delete lead
   const deleteLead = async (id) => {
+    const token = localStorage.getItem("admin_token");
     if (!window.confirm("Delete this lead?")) return;
 
     try {
       await api.delete(`/leads/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchLeads();
+      fetchLeads(token);
     } catch {
       alert("Failed to delete lead");
     }
   };
 
-  // Search logic
   const filteredLeads = leads.filter(
     (l) =>
       l.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -69,7 +73,6 @@ export default function AdminDashboard() {
       l.phone?.includes(search)
   );
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredLeads.length / ITEMS_PER_PAGE);
   const paginatedLeads = filteredLeads.slice(
     (page - 1) * ITEMS_PER_PAGE,
