@@ -22,6 +22,18 @@ export default function AdminDashboard() {
     }
   };
 
+useEffect(() => {
+  // 🔥 RESET ANY LEFTOVER MODAL STYLES
+  document.body.style.overflow = "auto";
+  document.body.style.pointerEvents = "auto";
+
+  return () => {
+    document.body.style.overflow = "auto";
+    document.body.style.pointerEvents = "auto";
+  };
+}, []);
+
+
   useEffect(() => {
     const token = localStorage.getItem("admin_token");
 

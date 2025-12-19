@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../utils/api";
 
 const ConsultationFlow = ({ onClose }) => {
@@ -16,12 +16,24 @@ const ConsultationFlow = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  // 🔑 LOCK BODY SCROLL
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    document.body.style.pointerEvents = "auto";
+
+    return () => {
+      document.body.style.overflow = "auto";
+      document.body.style.pointerEvents = "auto";
+    };
+  }, []);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const submitForm = async (e) => {
     e.preventDefault();
+
     try {
       setLoading(true);
 
@@ -40,9 +52,9 @@ Notes: ${formData.notes}
 
       setTimeout(() => {
         setSuccess(false);
-        onClose();
+        onClose(); // 🔑 triggers cleanup
       }, 2500);
-    } catch (err) {
+    } catch {
       alert("❌ Submission failed. Try again.");
     } finally {
       setLoading(false);
@@ -52,7 +64,6 @@ Notes: ${formData.notes}
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl max-w-md w-full p-6 relative">
-
         {/* CLOSE */}
         <button
           onClick={onClose}
@@ -71,7 +82,6 @@ Notes: ${formData.notes}
           </div>
         ) : (
           <>
-            {/* STEP 1 – QUESTIONS */}
             {step === 1 && (
               <>
                 <h2 className="text-xl font-bold mb-4">
@@ -99,7 +109,6 @@ Notes: ${formData.notes}
               </>
             )}
 
-            {/* STEP 2 – FORM */}
             {step === 2 && (
               <>
                 <h2 className="text-xl font-bold mb-4">
