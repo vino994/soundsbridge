@@ -37,7 +37,7 @@ const services = [
 
 const OurServices = () => {
   return (
-    <section className="bg-gradient-to-l from-white via-sky-200 to-sky-300 py-16 md:py-24">
+    <section className="bg-gradient-to-l from-white via-sky-200 to-sky-300 py-16 md:py-24" id="resources">
       <div className="container mx-auto px-4 md:px-6">
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
